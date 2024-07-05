@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-num-bigint = "0.4"
+"rfd" = "0.14.1"
+"rand" = "0.8"
+"egui" = "0.28.0"

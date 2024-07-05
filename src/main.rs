@@ -1,13 +1,10 @@
 mod libkf;
 mod kfutils;
-use kfutils::read_kf;
-use kfutils::to_bin;
+mod kfgen;
 
 fn main() {
-    let bin_key = to_bin(read_kf("src/key.kf"));
-    let cipher = libkf::generate_cipher("Jake".to_string(), bin_key.clone());
+    let cipher = libkf::generate_cipher();
     println!("{}", cipher);
-    let plaintext = libkf::generate_plaintext(cipher.to_string(), bin_key.clone());
+    let plaintext = libkf::generate_plaintext();
     println!("{}", plaintext);
-
 }
