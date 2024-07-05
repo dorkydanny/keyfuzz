@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 num-bigint = "0.4"
+"rfd" = "0.14.1"

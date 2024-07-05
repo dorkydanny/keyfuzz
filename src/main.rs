@@ -9,5 +9,4 @@ fn main() {
     println!("{}", cipher);
     let plaintext = libkf::generate_plaintext(cipher.to_string(), bin_key.clone());
     println!("{}", plaintext);
-
 }
