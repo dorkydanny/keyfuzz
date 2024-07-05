@@ -1,4 +1,7 @@
-use crate::kfutils::to_bin;
+use std::fs::read_to_string;
+
+use crate::{kfgen::generate_kf, kfutils::{self, read_sf, to_bin}};
+use rfd::FileDialog;
 
 fn bxor(bin_text: String, bin_key: &str) -> String{
     assert!(bin_text.bytes().all(|t| t == b'0' || t == b'1'));
@@ -10,12 +13,24 @@ fn bxor(bin_text: String, bin_key: &str) -> String{
         .collect()
 }
 
-pub fn generate_cipher(original_text: String, bin_key: String) -> String{
+pub fn generate_cipher() -> String{
+    let original_text = read_sf();
+    let bin_key = to_bin(read_to_string(generate_kf(500)).expect("Bad Path"));
     let bin_text = to_bin(original_text.to_string());
-    bxor(bin_text, bin_key.as_str())
+    let cipherfile = bxor(bin_text, bin_key.as_str());
+    let path = FileDialog::save_file(
+        FileDialog::new()
+        .add_filter("plaintext", &["txt"])
+    )
+    .expect("No save path provided");
+    std::fs::write(path.clone(), cipherfile.clone()).expect("Unable to write File");
+    cipherfile
 }
 
-pub fn generate_plaintext(cipher_text: String, bin_key: String) -> String{
+pub fn generate_plaintext() -> String{
+    let cipher_text = read_sf();
+    let path = kfutils::open_keyfile();
+    let bin_key = to_bin(std::fs::read_to_string(path.clone()).expect("Bad Path"));
     let byte_str = bxor(cipher_text,bin_key.as_str());
     let bytes: Vec<u8> = byte_str
     .chars()
@@ -29,6 +44,12 @@ pub fn generate_plaintext(cipher_text: String, bin_key: String) -> String{
 
 
     let plaintext: String = bytes.iter().map(|&b| b as char).collect();
+    println!("Delete keyfuzz file?: y/n");
+    let mut delete_key = String::new();
+    std::io::stdin().read_line(&mut delete_key).unwrap();
+    if delete_key == "y" {
+        std::fs::remove_file(path).expect("Bad Path");
+    }
 
     plaintext
 }
