@@ -1,4 +1,4 @@
-use std::fs::read_to_string;
+use std::fs::{read_to_string, remove_file};
 
 use crate::{kfgen::generate_kf, kfutils::{self, read_sf, to_bin}};
 use rfd::FileDialog;
@@ -47,8 +47,9 @@ pub fn generate_plaintext() -> String{
     println!("Delete keyfuzz file?: y/n");
     let mut delete_key = String::new();
     std::io::stdin().read_line(&mut delete_key).unwrap();
-    if delete_key == "y" {
-        std::fs::remove_file(path).expect("Bad Path");
+    delete_key = String::from(delete_key.trim());
+    if delete_key == String::from("y") {
+        remove_file(path).expect("Bad Path");
     }
 
     plaintext
