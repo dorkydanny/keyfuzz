@@ -1,6 +1,6 @@
-mod kfutils;
+use crate::kfutils::to_bin;
 
-pub fn bxor(bin_text: String, bin_key: &str) -> String{
+fn bxor(bin_text: String, bin_key: &str) -> String{
     assert!(bin_text.bytes().all(|t| t == b'0' || t == b'1'));
     assert!(bin_key.bytes().all(|t| t == b'0' || t == b'1'));
     bin_text
