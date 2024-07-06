@@ -13,11 +13,14 @@ pub fn open_keyfile() -> PathBuf{
 }
 
 fn open_plainfile() -> PathBuf{
-    FileDialog::new()
+    let path = FileDialog::new()
     .add_filter("plaintext", &["txt"])
     .set_directory(".")
-    .pick_file()
-    .expect("Invalid File")
+    .pick_file();
+let result = match path {
+    Ok(path) => path,
+    Err(error) => panic!("Problem opening the file: {error:?}"),
+};
 }
 
 pub fn read_kf() -> String {

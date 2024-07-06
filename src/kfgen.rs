@@ -15,9 +15,19 @@ pub fn generate_kf(length: u64) -> PathBuf{
     }
     let path = FileDialog::save_file(
         FileDialog::new()
-        .add_filter("plaintext", &["txt"])
+        .add_filter("keyfile", &["kf"])
     )
     .expect("No save path provided");
-    std::fs::write(path.clone(), keyfile).expect("Unable to write File");
+    let extension_included = path.ends_with(".kf");
+    if extension_included {
+        std::fs::write(path.clone(), keyfile).expect("Unable to write File");
+    } else {
+        std::fs::write(format!("{}.kf", path
+                                                .clone()
+                                                .into_os_string()
+                                                .into_string()
+                                                .expect("Error Converting File To String")
+                                    ), keyfile).expect("Unable to write File");
+    }
     path
 }
