@@ -9,28 +9,26 @@ pub fn open_keyfile() -> PathBuf{
     .add_filter("keyfile", &["kf"])
     .set_directory(".")
     .pick_file()
-    .expect("Invalid File")
+    .unwrap_or(PathBuf::new())
 }
 
 fn open_plainfile() -> PathBuf{
     let path = FileDialog::new()
     .add_filter("plaintext", &["txt"])
     .set_directory(".")
-    .pick_file();
-let result = match path {
-    Ok(path) => path,
-    Err(error) => panic!("Problem opening the file: {error:?}"),
-};
+    .pick_file()
+    .unwrap_or(PathBuf::new());
+    path
 }
 
 pub fn read_kf() -> String {
     let file_path = generate_kf(50000);
-    read_to_string(file_path).expect("Could not read file.")
+    read_to_string(file_path).unwrap_or(String::new())
 }
 
 pub fn read_sf() -> String {
     let file_path = open_plainfile();
-    read_to_string(file_path).expect("Could not read file.")
+    read_to_string(file_path).unwrap_or(String::new())
 }
 
 pub fn to_bin(word: String) -> String {

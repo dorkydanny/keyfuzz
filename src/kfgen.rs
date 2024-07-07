@@ -1,4 +1,5 @@
-use std::fmt::Write;
+use std::{fmt::Write, fs::read_to_string};
+use egui::epaint::tessellator::Path;
 use rfd::FileDialog;
 use rand::{distributions::Alphanumeric, Rng};
 use std::path::PathBuf;
@@ -17,7 +18,10 @@ pub fn generate_kf(length: u64) -> PathBuf{
         FileDialog::new()
         .add_filter("keyfile", &["kf"])
     )
-    .expect("No save path provided");
+    .unwrap_or(PathBuf::new());
+    if read_to_string(path.clone()).unwrap_or(String::new()) == "" {
+        return PathBuf::new()
+    }
     let extension_included = path.ends_with(".kf");
     if extension_included {
         std::fs::write(path.clone(), keyfile).expect("Unable to write File");

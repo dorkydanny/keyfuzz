@@ -1,6 +1,6 @@
 use std::fs::{read_to_string, remove_file};
 
-use crate::{kfgen::generate_kf, kfutils::{self, read_sf, read_kf, to_bin}};
+use crate::kfutils::{self, open_keyfile, read_sf, to_bin};
 use rfd::FileDialog;
 
 fn bxor(bin_text: String, bin_key: &str) -> String{
@@ -15,7 +15,11 @@ fn bxor(bin_text: String, bin_key: &str) -> String{
 
 pub fn generate_cipher() -> String{
     let original_text = read_sf();
-    let bin_key = to_bin(read_kf());
+    let cipher_key = read_to_string(open_keyfile()).unwrap_or(String::new());
+    if original_text == "" || cipher_key == "" {
+        return String::from("Error");
+    }
+    let bin_key = to_bin(cipher_key);
     let bin_text = to_bin(original_text.to_string());
     let cipherfile = bxor(bin_text, bin_key.as_str());
     let path = FileDialog::save_file(
