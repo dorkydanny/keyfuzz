@@ -14,24 +14,26 @@ pub fn generate_kf(length: u64) -> PathBuf{
         .collect();
         write!(&mut keyfile, "{}", s).unwrap();
     }
-    let path = FileDialog::save_file(
+    let mut path = FileDialog::save_file(
         FileDialog::new()
         .add_filter("keyfile", &["kf"])
     )
     .unwrap_or(PathBuf::new());
-    if read_to_string(path.clone()).unwrap_or(String::new()) == "" {
-        return PathBuf::new()
-    }
+    println!("Path: {:?}", path);
+    let mut err = 0;
     let extension_included = path.ends_with(".kf");
     if extension_included {
-        std::fs::write(path.clone(), keyfile).expect("Unable to write File");
+        std::fs::write(path.clone(), keyfile).unwrap_or(err = 1);
     } else {
         std::fs::write(format!("{}.kf", path
                                                 .clone()
                                                 .into_os_string()
                                                 .into_string()
-                                                .expect("Error Converting File To String")
-                                    ), keyfile).expect("Unable to write File");
+                                                .unwrap()
+                                    ), keyfile).unwrap_or(err = 1);
+    }
+    if err == 1 {
+        path = PathBuf::new();
     }
     path
 }

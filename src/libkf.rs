@@ -2,6 +2,7 @@ use std::fs::{read_to_string, remove_file};
 
 use crate::kfutils::{self, open_keyfile, read_sf, to_bin};
 use rfd::FileDialog;
+use std::path::PathBuf;
 
 fn bxor(bin_text: String, bin_key: &str) -> String{
     assert!(bin_text.bytes().all(|t| t == b'0' || t == b'1'));
@@ -15,8 +16,11 @@ fn bxor(bin_text: String, bin_key: &str) -> String{
 
 pub fn generate_cipher() -> String{
     let original_text = read_sf();
+    if original_text == "" {
+        return String::from("Error");
+    }
     let cipher_key = read_to_string(open_keyfile()).unwrap_or(String::new());
-    if original_text == "" || cipher_key == "" {
+    if cipher_key == "" {
         return String::from("Error");
     }
     let bin_key = to_bin(cipher_key);
@@ -26,9 +30,9 @@ pub fn generate_cipher() -> String{
         FileDialog::new()
         .add_filter("plaintext", &["txt"])
     )
-    .expect("No save path provided");
-    std::fs::write(path.clone(), cipherfile.clone()).expect("Unable to write File");
-    cipherfile
+    .unwrap_or(PathBuf::new());
+    std::fs::write(path.clone(), cipherfile.clone()).unwrap();
+    String::from("Success")
 }
 
 pub fn generate_plaintext() -> String{

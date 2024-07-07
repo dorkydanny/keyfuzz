@@ -29,7 +29,8 @@ impl eframe::App for MyEguiApp {
            let generate_keyfile = ui.button("Generate Keyfuzz File");
            if generate_keyfile.clicked() {
             println!("Genkey clicked");
-            kfgen::generate_kf(500);
+            let result = kfgen::generate_kf(500);
+            println!("{}", result.into_os_string().into_string().unwrap());
            }
            let generate_cipher = ui.button("Generate Cipher");
            if generate_cipher.clicked() {
