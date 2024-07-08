@@ -10,15 +10,15 @@ fn bxor(bin_text: &mut [u8], bin_key: &[u8]) {
 }
 
 pub fn generate_cipher() -> Result<String, Box<dyn std::error::Error>>{
-    let mut mkv_data = std::fs::read(kfutils::open_plainfile())?;
-    let cipher_key = kfgen::generate_kf(mkv_data.len())?;
-    bxor(&mut mkv_data, &cipher_key);
+    let mut data = std::fs::read(kfutils::open_plainfile())?;
+    let cipher_key = kfgen::generate_kf(data.len())?;
+    bxor(&mut data, &cipher_key);
     let path = FileDialog::save_file(
         FileDialog::new()
         .add_filter("plaintext", &["mkv", "emkv"])
     )
     .unwrap_or(PathBuf::new());
-    std::fs::write(path.clone(), mkv_data)?;
+    std::fs::write(path.clone(), data)?;
     Ok(String::from("Success"))
 }
 

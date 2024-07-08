@@ -9,3 +9,5 @@ edition = "2021"
 "egui" = "0.28.0"
 "eframe" = "0.28.1"
 rand_chacha = "0.3.1"
+egui_extras = { version = "*", features = ["all_loaders"] }
+image = "0.25.1"
