@@ -18,14 +18,10 @@ pub fn generate_kf(length: usize) -> Result<Vec<u8>, Box<dyn std::error::Error>>
 
 pub fn generate_seed() -> std::io::Result<()> { 
     let seed = rand::rngs::OsRng.gen::<[u8; 32]>();
-    let path_result = FileDialog::save_file(
+    let path = FileDialog::save_file(
         FileDialog::new()
         .add_filter("seedfile", &["kfs"])
-    ).ok_or("Error");
-    let path = match path_result {
-        Ok(file) => file,
-        Err(error) => panic!("Problem opening the file: {error:?}"),
-    };
+    ).ok_or("Bad save path").map_err(|err| std::io::Error::new(std::io::ErrorKind::NotFound, err))?;
     println!("Path: {:?}", path);
     let extension_included = path.ends_with(".kfs");
     let path = if extension_included { path } else { 
