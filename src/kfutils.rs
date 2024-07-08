@@ -11,7 +11,6 @@ pub fn open_seed() -> PathBuf{
 
 pub fn open_plainfile() -> PathBuf{
     let path = FileDialog::new()
-    .add_filter("plaintext", &["emkv", "mkv"])
     .set_directory(".")
     .pick_file()
     .unwrap_or(PathBuf::new());
