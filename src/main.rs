@@ -12,7 +12,11 @@ fn main() {
 }
 
 #[derive(Default)]
-struct MyEguiApp {}
+struct MyEguiApp {
+    genkey_labeltext: RichText,
+    encrypt_labeltext: RichText,
+    decrypt_labeltext: RichText,
+}
 
 impl MyEguiApp {
     fn new(_cc: &eframe::CreationContext<'_>) -> Self {
@@ -31,34 +35,49 @@ impl eframe::App for MyEguiApp {
             ui.heading("KeyFuzz");
             let path = std::env::current_dir().unwrap();
             let keygenimg = Image::new(format!("file://{}/src/assets/keygen.png", path.to_str().unwrap()));
-            let seed_label = RichText::new("Generate Seed").font(FontId::new(24.0, FontFamily::Proportional)).color(Color32::WHITE);
+            let seed_label = RichText::new("Generate Seed")
+                                        .font(FontId::new(24.0, FontFamily::Proportional))
+                                        .color(Color32::WHITE);
             ui.heading(seed_label);
             if ui.add_sized([80.0, 80.0], widgets::ImageButton::new(keygenimg)).clicked() {
-                println!("Image button clicked");
-                println!("Genkey clicked");
-                let mut genkey_labeltext = String::from("");
                 match kfgen::generate_seed() {
-                    Ok(_) => genkey_labeltext = String::from("Success"),
-                    Err(e) => genkey_labeltext = e.to_string(),
+                    Ok(_) => self.genkey_labeltext = RichText::new("Success")
+                                .font(FontId::new(12.0, FontFamily::Proportional))
+                                .color(Color32::LIGHT_GREEN),
+                    Err(e) => self.genkey_labeltext = RichText::from(e.to_string())
+                    .font(FontId::new(12.0, FontFamily::Proportional))
+                    .color(Color32::LIGHT_RED),
                 };
-                ui.label(genkey_labeltext);
             }
+            ui.label(self.genkey_labeltext.clone());
             let encryptimg = Image::new(format!("file://{}/src/assets/encrypt.png", path.to_str().unwrap()));
             let encrypt_label = RichText::new("Encrypt File").font(FontId::new(24.0, FontFamily::Proportional)).color(Color32::WHITE);
             ui.heading(encrypt_label);
             if ui.add_sized([80.0, 80.0], widgets::ImageButton::new(encryptimg)).clicked() {
-                println!("Encrypt clicked");
-                    let result = libkf::generate_cipher();
-                    //ui.label(result);
+                match libkf::generate_cipher() {
+                    Ok(_) => self.encrypt_labeltext = RichText::new("Success")
+                                        .font(FontId::new(12.0, FontFamily::Proportional))
+                                        .color(Color32::LIGHT_GREEN),
+                    Err(e) => self.encrypt_labeltext = RichText::from(e.to_string())
+                                                            .font(FontId::new(12.0, FontFamily::Proportional))
+                                                            .color(Color32::LIGHT_RED),
+                };
             }
+            ui.label(self.encrypt_labeltext.clone());
             let decryptimg = Image::new(format!("file://{}/src/assets/decrypt.png", path.to_str().unwrap()));
             let decrypt_label = RichText::new("Decrypt File").font(FontId::new(24.0, FontFamily::Proportional)).color(Color32::WHITE);
             ui.heading(decrypt_label);
             if ui.add_sized([80.0, 80.0], widgets::ImageButton::new(decryptimg)).clicked() {
-                println!("Decrypt clicked");
-                    let result = libkf::generate_cipher();
-                    //ui.label(result);
+                match libkf::generate_cipher() {
+                    Ok(_) => self.decrypt_labeltext = RichText::new("Success")
+                                        .font(FontId::new(12.0, FontFamily::Proportional))
+                                        .color(Color32::LIGHT_GREEN),
+                    Err(e) => self.decrypt_labeltext = RichText::from(e.to_string())
+                                                            .font(FontId::new(12.0, FontFamily::Proportional))
+                                                            .color(Color32::LIGHT_RED),
+                };
             }
+            ui.label(self.decrypt_labeltext.clone());
        });
    }
 }

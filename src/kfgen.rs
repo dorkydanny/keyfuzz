@@ -22,8 +22,7 @@ pub fn generate_seed() -> std::io::Result<()> {
         FileDialog::new()
         .add_filter("seedfile", &["kfs"])
     ).ok_or("Bad save path").map_err(|err| std::io::Error::new(std::io::ErrorKind::NotFound, err))?;
-    println!("Path: {:?}", path);
-    let extension_included = path.ends_with(".kfs");
+    let extension_included = path.extension().is_some_and(|ext| ext == "kfs");
     let path = if extension_included { path } else { 
         PathBuf::from({
             let mut path = path.as_os_str().to_os_string();
