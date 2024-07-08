@@ -4,18 +4,17 @@ use std::path::PathBuf;
 use crate::kfgen;
 
 fn bxor(bin_text: &mut [u8], bin_key: &[u8]) {
-    for (t, &k) in bin_text.iter_mut().zip(bin_key.iter()) {
-        *t ^= k;
+    for (t, &k) in bin_text.iter_mut().zip(bin_key.iter()) { 
+        *t ^= k; 
     }
 }
 
-pub fn generate_cipher() -> Result<String, Box<dyn std::error::Error>>{
+pub fn crypt() -> Result<String, Box<dyn std::error::Error>>{
     let mut data = std::fs::read(kfutils::open_plainfile())?;
     let cipher_key = kfgen::generate_kf(data.len())?;
     bxor(&mut data, &cipher_key);
     let path = FileDialog::save_file(
         FileDialog::new()
-        .add_filter("plaintext", &["mkv", "emkv"])
     )
     .unwrap_or(PathBuf::new());
     std::fs::write(path.clone(), data)?;

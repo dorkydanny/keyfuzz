@@ -54,7 +54,7 @@ impl eframe::App for MyEguiApp {
             let encrypt_label = RichText::new("Encrypt File").font(FontId::new(24.0, FontFamily::Proportional)).color(Color32::WHITE);
             ui.heading(encrypt_label);
             if ui.add_sized([80.0, 80.0], widgets::ImageButton::new(encryptimg)).clicked() {
-                match libkf::generate_cipher() {
+                match libkf::crypt() {
                     Ok(_) => self.encrypt_labeltext = RichText::new("Success")
                                         .font(FontId::new(12.0, FontFamily::Proportional))
                                         .color(Color32::LIGHT_GREEN),
@@ -68,7 +68,7 @@ impl eframe::App for MyEguiApp {
             let decrypt_label = RichText::new("Decrypt File").font(FontId::new(24.0, FontFamily::Proportional)).color(Color32::WHITE);
             ui.heading(decrypt_label);
             if ui.add_sized([80.0, 80.0], widgets::ImageButton::new(decryptimg)).clicked() {
-                match libkf::generate_cipher() {
+                match libkf::crypt() {
                     Ok(_) => self.decrypt_labeltext = RichText::new("Success")
                                         .font(FontId::new(12.0, FontFamily::Proportional))
                                         .color(Color32::LIGHT_GREEN),
