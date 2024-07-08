@@ -1641,6 +1641,7 @@ dependencies = [
  "eframe",
  "egui",
  "rand",
+ "rand_chacha",
  "rfd",
 ]
 

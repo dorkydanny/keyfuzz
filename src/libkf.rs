@@ -1,43 +1,30 @@
-use std::fs::{read_to_string, remove_file};
-
-use crate::kfutils::{self, open_keyfile, read_sf, to_bin};
+use crate::kfutils;
 use rfd::FileDialog;
 use std::path::PathBuf;
+use crate::kfgen;
 
-fn bxor(bin_text: String, bin_key: &str) -> String{
-    assert!(bin_text.bytes().all(|t| t == b'0' || t == b'1'));
-    assert!(bin_key.bytes().all(|t| t == b'0' || t == b'1'));
-    bin_text
-        .bytes()
-        .zip(bin_key.bytes().cycle())
-        .map(|(t, k)| (t ^ (k & 1)) as char)
-        .collect()
+fn bxor(bin_text: &mut [u8], bin_key: &[u8]) {
+    for (t, &k) in bin_text.iter_mut().zip(bin_key.iter()) {
+        *t ^= k;
+    }
 }
 
-pub fn generate_cipher() -> String{
-    let original_text = read_sf();
-    if original_text == "" {
-        return String::from("Error");
-    }
-    let cipher_key = read_to_string(open_keyfile()).unwrap_or(String::new());
-    if cipher_key == "" {
-        return String::from("Error");
-    }
-    let bin_key = to_bin(cipher_key);
-    let bin_text = to_bin(original_text.to_string());
-    let cipherfile = bxor(bin_text, bin_key.as_str());
+pub fn generate_cipher() -> Result<String, Box<dyn std::error::Error>>{
+    let mut mkv_data = std::fs::read(kfutils::open_plainfile())?;
+    let cipher_key = kfgen::generate_kf(mkv_data.len())?;
+    bxor(&mut mkv_data, &cipher_key);
     let path = FileDialog::save_file(
         FileDialog::new()
-        .add_filter("plaintext", &["txt"])
+        .add_filter("plaintext", &["mkv", "emkv"])
     )
     .unwrap_or(PathBuf::new());
-    std::fs::write(path.clone(), cipherfile.clone()).unwrap();
-    String::from("Success")
+    std::fs::write(path.clone(), mkv_data)?;
+    Ok(String::from("Success"))
 }
 
-pub fn generate_plaintext() -> String{
+/*pub fn generate_plaintext() -> String{
     let cipher_text = read_sf();
-    let path = kfutils::open_keyfile();
+    let path = kfutils::open_seed();
     let bin_key = to_bin(std::fs::read_to_string(path.clone()).expect("Bad Path"));
     let byte_str = bxor(cipher_text,bin_key.as_str());
     let bytes: Vec<u8> = byte_str
@@ -61,4 +48,4 @@ pub fn generate_plaintext() -> String{
     }
 
     plaintext
-}
+}*/

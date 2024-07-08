@@ -1,39 +1,40 @@
-use std::{fmt::Write, fs::read_to_string};
-use egui::epaint::tessellator::Path;
+use rand::rngs::StdRng;
 use rfd::FileDialog;
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{Rng, RngCore, SeedableRng};
 use std::path::PathBuf;
+use crate::kfutils::open_seed;
+use std::fs::File;
+use std::io::Read;
 
-pub fn generate_kf(length: u64) -> PathBuf{
-    let mut keyfile: String = String::new();
-    for _ in 1..=length {
-        let s: String = rand::thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(7)
-        .map(char::from)
-        .collect();
-        write!(&mut keyfile, "{}", s).unwrap();
-    }
-    let mut path = FileDialog::save_file(
+pub fn generate_kf(length: usize) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    let mut seed_path = File::open(open_seed())?;
+    let mut seed = [0u8; 32];
+    seed_path.read_exact(&mut seed)?;
+    let mut seeded_rng = StdRng::from_seed(seed);
+    let mut cipher_bin = vec![0u8; length];
+    seeded_rng.fill_bytes(&mut cipher_bin);
+    Ok(cipher_bin)
+}
+
+pub fn generate_seed() -> std::io::Result<()> { 
+    let seed = rand::rngs::OsRng.gen::<[u8; 32]>();
+    let path_result = FileDialog::save_file(
         FileDialog::new()
-        .add_filter("keyfile", &["kf"])
-    )
-    .unwrap_or(PathBuf::new());
+        .add_filter("seedfile", &["kfs"])
+    ).ok_or("Error");
+    let path = match path_result {
+        Ok(file) => file,
+        Err(error) => panic!("Problem opening the file: {error:?}"),
+    };
     println!("Path: {:?}", path);
-    let mut err = 0;
-    let extension_included = path.ends_with(".kf");
-    if extension_included {
-        std::fs::write(path.clone(), keyfile).unwrap_or(err = 1);
-    } else {
-        std::fs::write(format!("{}.kf", path
-                                                .clone()
-                                                .into_os_string()
-                                                .into_string()
-                                                .unwrap()
-                                    ), keyfile).unwrap_or(err = 1);
-    }
-    if err == 1 {
-        path = PathBuf::new();
-    }
-    path
+    let extension_included = path.ends_with(".kfs");
+    let path = if extension_included { path } else { 
+        PathBuf::from({
+            let mut path = path.as_os_str().to_os_string();
+            path.push(".kfs");
+            path
+        })
+    };
+    std::fs::write(path, seed)?;
+    Ok(())
 }

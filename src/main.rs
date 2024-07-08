@@ -29,13 +29,20 @@ impl eframe::App for MyEguiApp {
            let generate_keyfile = ui.button("Generate Keyfuzz File");
            if generate_keyfile.clicked() {
             println!("Genkey clicked");
-            let result = kfgen::generate_kf(500);
-            println!("{}", result.into_os_string().into_string().unwrap());
+            let result = kfgen::generate_seed();
+            println!("{:?}", result);
            }
-           let generate_cipher = ui.button("Generate Cipher");
+           let generate_cipher = ui.button("Generate Seed");
            if generate_cipher.clicked() {
                 println!("Cipher clicked");
-                libkf::generate_cipher();
+                let bin = libkf::generate_cipher();
+                println!("{:?}", bin);
+           }
+           let generate_cipher = ui.button("Generate Plaintext");
+           if generate_cipher.clicked() {
+                println!("Cipher clicked");
+                let bin = libkf::generate_cipher();
+                println!("{:?}", bin);
            }
        });
    }
